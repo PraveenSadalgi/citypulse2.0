@@ -36,7 +36,7 @@ export default function AIChatPage() {
               ref={iframeRef}
               src="https://aichatbot-flax-eta.vercel.app/"
               className="absolute inset-0 w-full h-full border-0"
-              allow="clipboard-read; clipboard-write"
+              allow="camera; microphone; geolocation; clipboard-read; clipboard-write"
               allowFullScreen
               onError={handleIframeError}
               title="AI Chatbot"
