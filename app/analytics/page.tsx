@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
+import AnimatedLoadingSkeleton from "@/components/ui/loading-skeleton"
 import { Sidebar } from "@/components/sidebar"
 import { BottomNav } from "@/components/bottom-nav"
 import { TopBar } from "@/components/top-bar"
@@ -59,15 +59,7 @@ export default function LeaderboardPage() {
           <TopBar />
           <div className="min-h-screen bg-gradient-to-b from-[#B8F1B0] to-white p-4 md:p-8">
             <div className="max-w-4xl mx-auto">
-              <div className="space-y-8">
-                <div className="space-y-2">
-                  <Skeleton className="h-10 w-64 mx-auto" />
-                  <Skeleton className="h-6 w-96 mx-auto" />
-                </div>
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <Skeleton key={i} className="h-20 w-full rounded-lg" />
-                ))}
-              </div>
+              <AnimatedLoadingSkeleton />
             </div>
           </div>
         </main>

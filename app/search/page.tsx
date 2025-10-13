@@ -8,6 +8,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import Link from 'next/link';
 import Image from 'next/image';
+import AnimatedLoadingSkeleton from "@/components/ui/loading-skeleton";
 
 type NavItem = { href: string; label: string; icon: any };
 
@@ -198,11 +199,7 @@ export default function SearchPage() {
             <div className="mb-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Issues</h2>
               {isLoadingRecent ? (
-                <div className="space-y-4">
-                  {[...Array(3)].map((_, i) => (
-                    <div key={i} className="animate-pulse bg-gray-100 rounded-lg h-24"></div>
-                  ))}
-                </div>
+                <AnimatedLoadingSkeleton />
               ) : results.length > 0 ? (
                 <div className="space-y-4">
                   {results.map((result) => (

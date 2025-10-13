@@ -5,10 +5,9 @@ import { useRouter } from "next/navigation"
 import { Home, BarChart2, MessageSquare, User } from "lucide-react"
 import { BottomNav } from "@/components/bottom-nav"
 import { PostCard } from "@/components/post-card"
-import { PostCardSkeleton } from "@/components/post-card-skeleton"
+import AnimatedLoadingSkeleton from "@/components/ui/loading-skeleton"
 import { TopBar } from "@/components/top-bar"
 import { Sidebar } from "@/components/sidebar"
-import { CommentsDialog } from "@/components/comments-dialog"
 import Link from "next/link"
 import { supabase } from "@/lib/supabase"
 
@@ -38,7 +37,6 @@ export default function HomePage() {
   const router = useRouter()
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
-  const [openId, setOpenId] = useState<string | null>(null)
 
   useEffect(() => {
     const loadPosts = async () => {
@@ -143,37 +141,6 @@ export default function HomePage() {
     loadPosts()
   }, [])
 
-  const handleShare = async (id: string) => {
-    try {
-      await navigator.clipboard.writeText(`${window.location.origin}/posts/${id}`)
-      // Optional: Show a toast notification
-    } catch (err) {
-      console.error("Failed to copy link:", err)
-    }
-  }
-
-  const handleLike = (id: string) => {
-    setPosts(prev => 
-      prev.map(p => 
-        p.id === id ? { ...p, likes: p.likes + 1 } : p
-      )
-    )
-  }
-
-  const handleDelete = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from("issues")
-        .delete()
-        .eq("id", Number(id))
-
-      if (!error) {
-        setPosts(prev => prev.filter(p => p.id !== id))
-      }
-    } catch (err) {
-      console.error("Error deleting post:", err)
-    }
-  }
 
   return (
     <div className="md:flex">
@@ -184,25 +151,16 @@ export default function HomePage() {
           <div className="h-32 bg-gradient-to-b from-[#B8F1B0] to-white"></div>
           <section className="mx-auto w-full max-w-2xl px-4 md:px-8 -mt-20 relative z-10">
               {posts.map((post) => (
-                <PostCard
-                  key={post.id}
-                  post={post}
-                  onEdit={(id) => router.push(`/posts/${id}/edit`)}
-                  onDelete={handleDelete}
-                  onLike={handleLike}
-                  onComments={(id) => setOpenId(id)}
-                  onShare={handleShare}
-                />
+                <div key={post.id} className="mb-6">
+                  <PostCard post={post} />
+                </div>
               ))}
               
               {loading && posts.length === 0 && (
-                <>
-                  <PostCardSkeleton />
-                  <PostCardSkeleton />
-                </>
+                <div className="mb-6">
+                  <AnimatedLoadingSkeleton />
+                </div>
               )}
-              
-              {loading && posts.length > 0 && <PostCardSkeleton />}
               
               {!loading && posts.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
@@ -254,14 +212,6 @@ export default function HomePage() {
               { href: "/profile", label: "Profile", icon: User },
             ]}
           />
-        
-        {openId && (
-          <CommentsDialog 
-            postId={openId} 
-            open={!!openId} 
-            onOpenChange={(isOpen) => !isOpen && setOpenId(null)} 
-          />
-        )}
       </main>
     </div>
   )

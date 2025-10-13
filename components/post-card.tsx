@@ -1,30 +1,95 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { MapPin, MoreHorizontal, Heart, Share2, MessageCircle, ThumbsDown } from "lucide-react"
+import { MapPin, Heart, Share2, MessageCircle } from "lucide-react"
 import { PriorityBadge } from "@/components/priority-badge"
+import { CommentDialog } from "@/components/comment-dialog"
 import type { Post } from "@/lib/local-db"
+
+interface PostInteraction {
+  likes: number
+  comments: number
+  shares: number
+  isLiked: boolean
+}
 
 export function PostCard({
   post,
-  onEdit,
-  onDelete,
-  onLike,
-  onComments,
-  onShare,
 }: {
   post: Post
-  onEdit?: (id: string) => void
-  onDelete?: (id: string) => void
-  onLike?: (id: string) => void
-  onComments?: (id: string) => void
-  onShare?: (id: string) => void
 }) {
+  const [interaction, setInteraction] = useState<PostInteraction>({
+    likes: post.likes || 0,
+    comments: post.comments?.length || 0,
+    shares: post.shares || 0,
+    isLiked: false
+  })
+  const [isCommentDialogOpen, setIsCommentDialogOpen] = useState(false)
+
+  // Load interaction data from localStorage on mount
+  useEffect(() => {
+    const savedInteraction = localStorage.getItem(`post_${post.id}_interaction`)
+    const savedComments = localStorage.getItem(`post_${post.id}_comments`)
+    
+    if (savedInteraction) {
+      const parsedInteraction = JSON.parse(savedInteraction)
+      // Update comment count from localStorage if available
+      if (savedComments) {
+        const comments = JSON.parse(savedComments)
+        parsedInteraction.comments = comments.length
+      }
+      setInteraction(parsedInteraction)
+    } else if (savedComments) {
+      // If no interaction data but comments exist, update comment count
+      const comments = JSON.parse(savedComments)
+      setInteraction(prev => ({
+        ...prev,
+        comments: comments.length
+      }))
+    }
+  }, [post.id])
+
+  // Save interaction data to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem(`post_${post.id}_interaction`, JSON.stringify(interaction))
+  }, [interaction, post.id])
+
+  const handleLike = () => {
+    setInteraction(prev => ({
+      ...prev,
+      likes: prev.isLiked ? prev.likes - 1 : prev.likes + 1,
+      isLiked: !prev.isLiked
+    }))
+  }
+
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/posts/${post.id}`)
+      setInteraction(prev => ({
+        ...prev,
+        shares: prev.shares + 1
+      }))
+      // You could add a toast notification here
+    } catch (err) {
+      console.error("Failed to copy link:", err)
+    }
+  }
+
+  const handleComment = () => {
+    setIsCommentDialogOpen(true)
+  }
+
+  const handleCommentAdded = (comment: any) => {
+    // Update comment count when a new comment is added
+    setInteraction(prev => ({
+      ...prev,
+      comments: prev.comments + 1
+    }))
+  }
   return (
     <Card className="overflow-hidden">
       <CardHeader className="pb-0">
@@ -58,19 +123,6 @@ export function PostCard({
               ) : null}
             </div>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="More">
-                <MoreHorizontal className="size-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onEdit?.(post.id)}>Edit</DropdownMenuItem>
-              <DropdownMenuItem className="text-destructive" onClick={() => onDelete?.(post.id)}>
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </CardHeader>
 
@@ -105,111 +157,34 @@ export function PostCard({
         <div className="flex items-center justify-between text-sm">
           <button
             type="button"
-            className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
-            onClick={() => onLike?.(post.id)}
-            aria-label="Upvote post"
+            className={`inline-flex items-center gap-1 transition-colors ${
+              interaction.isLiked 
+                ? "text-red-500 hover:text-red-600" 
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={handleLike}
+            aria-label="Like post"
           >
-            <Heart className="size-4" aria-hidden="true" />
-            {post.likes}
+            <Heart className={`size-4 ${interaction.isLiked ? "fill-current" : ""}`} aria-hidden="true" />
+            {interaction.likes}
           </button>
           <button
             type="button"
             className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
-            onClick={() => onComments?.(post.id)}
-            aria-label="Open comments"
+            onClick={handleComment}
+            aria-label="Add comment"
           >
             <MessageCircle className="size-4" aria-hidden="true" />
-            {post.comments?.length ?? 0}
+            {interaction.comments}
           </button>
           <button
             type="button"
             className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
-            onClick={() => onShare?.(post.id)}
+            onClick={handleShare}
             aria-label="Share post"
           >
             <Share2 className="size-4" aria-hidden="true" />
-            {post.shares}
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
-            onClick={() => onDelete?.(post.id)}
-            aria-label="Delete post"
-          >
-            Delete
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
-            onClick={() => (onEdit ? onEdit(post.id) : null)}
-            aria-label="Edit post"
-          >
-            Edit
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
-            onClick={() => (onLike ? onLike(post.id) : null)}
-            aria-label="Upvote duplicate"
-          >
-            {/* keeps layout balanced on large screens */}
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
-            onClick={() => (onDelete ? onDelete(post.id) : null)}
-            aria-label="Delete (duplicate)"
-          >
-            {/* spacer */}
-          </button>
-        </div>
-        <div className="mt-2 flex items-center justify-between text-sm">
-          <button
-            type="button"
-            className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
-            onClick={() => onEdit?.(post.id)}
-            aria-label="Edit"
-          >
-            {/* optional edit in second row */}
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
-            onClick={() => (onLike ? onLike(post.id) : null)}
-            aria-label="Upvote duplicate"
-          >
-            <Heart className="size-4" aria-hidden="true" /> {post.likes}
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
-            onClick={() => (onComments ? onComments(post.id) : null)}
-            aria-label="Comments duplicate"
-          >
-            <MessageCircle className="size-4" aria-hidden="true" /> {post.comments?.length ?? 0}
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
-            onClick={() => (onShare ? onShare(post.id) : null)}
-            aria-label="Share duplicate"
-          >
-            <Share2 className="size-4" aria-hidden="true" /> {post.shares}
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
-            onClick={() => (onDelete ? onDelete(post.id) : null)}
-            aria-label="Delete duplicate"
-          >
-            {/* extra spacing */}
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
-            aria-label="Downvote post"
-          >
-            <ThumbsDown className="size-4" aria-hidden="true" /> {post.dislikes ?? 0}
+            {interaction.shares}
           </button>
         </div>
 
@@ -219,6 +194,14 @@ export function PostCard({
           </p>
         ) : null}
       </CardContent>
+
+      <CommentDialog
+        postId={post.id}
+        postTitle={post.title}
+        open={isCommentDialogOpen}
+        onOpenChange={setIsCommentDialogOpen}
+        onCommentAdded={handleCommentAdded}
+      />
     </Card>
   )
 }
