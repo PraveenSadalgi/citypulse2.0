@@ -1,0 +1,5 @@
+- [x] Remove user-related code: mockUsers, filteredUsers, TabType 'users', activeTab state, People tab button, user rendering section
+- [x] Integrate real posts using usePosts hook instead of mockPosts
+- [x] Update post filtering to search in title and body (description) fields
+- [x] Adjust post rendering to use real post data (e.g., images from array)
+- [ ] Test the search functionality
