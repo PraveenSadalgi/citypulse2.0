@@ -20,7 +20,7 @@ export default function AIChatPage() {
       <Sidebar />
       <div className="flex-1 flex flex-col h-screen">
         <TopBar />
-        <div className="flex-1 relative">
+        <div className="flex-1 pb-20 sm:pb-0">
           {hasError ? (
             <div className="h-full flex items-center justify-center">
               <Alert variant="destructive" className="max-w-md">
@@ -35,7 +35,7 @@ export default function AIChatPage() {
             <iframe
               ref={iframeRef}
               src="https://aichatbot-flax-eta.vercel.app/"
-              className="absolute inset-0 w-full h-full border-0"
+              className="w-full h-full border-0"
               allow="camera; microphone; geolocation; clipboard-read; clipboard-write"
               allowFullScreen
               onError={handleIframeError}

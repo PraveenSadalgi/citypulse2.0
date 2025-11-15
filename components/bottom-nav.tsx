@@ -16,8 +16,8 @@ type Item = {
 const navItems: Item[] = [
   { href: "/home", label: "Home", icon: Home },
   { href: "/search", label: "Search", icon: Search },
-  { href: "/analytics", label: "", icon: BarChart2 }, // Empty label for the center button
-  { href: "/donate", label: "Donate", icon: Heart },
+  { href: "/analytics", label: "Leaderboard", icon: BarChart2 },
+  { href: "/aichat", label: "", icon: MessageSquare }, // Empty label for the center button
   { href: "/profile", label: "Profile", icon: User },
 ]
 
@@ -32,18 +32,18 @@ export function BottomNav() {
           <ul className="relative flex items-center justify-between">
             {navItems.map((item, index) => {
               const isActive = pathname === item.href
-              const isCenter = item.href === "/analytics"
+              const isCenter = item.href === "/aichat"
               const Icon = item.icon
-              
+
               if (isCenter) {
                 return (
                   <li key={item.href} className="relative -top-6">
                     <Link
-                      href="/analytics"
-                      aria-label="View leaderboard"
+                      href="/aichat"
+                      aria-label="AI Chat"
                       className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg shadow-green-200/80 transition-all hover:scale-105 hover:shadow-xl hover:shadow-green-200/50"
                     >
-                      <BarChart2 className="h-6 w-6" strokeWidth={2.5} />
+                      <MessageSquare className="h-6 w-6" strokeWidth={2.5} />
                     </Link>
                   </li>
                 )

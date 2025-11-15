@@ -135,14 +135,7 @@ export default function LeaderboardPage() {
           </div>
         </div>
         
-        <BottomNav
-          items={[
-            { href: "/home", label: "Home", icon: Home },
-            { href: "/analytics", label: "Leaderboard", icon: BarChart2, active: true },
-            { href: "/aichat", label: "AI Chat", icon: MessageSquare },
-            { href: "/profile", label: "Profile", icon: User },
-          ]}
-        />
+        <BottomNav />
       </main>
     </div>
   )
