@@ -73,7 +73,7 @@ export default function HomeChatPage() {
         <div className="flex-1 p-4">
           <Card className="max-w-4xl mx-auto h-[calc(100vh-200px)]">
             <CardHeader>
-              <CardTitle>Home Chatbot</CardTitle>
+              <CardTitle>CityZen Chat</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col h-full">
               <ScrollArea className="flex-1 pr-4">
