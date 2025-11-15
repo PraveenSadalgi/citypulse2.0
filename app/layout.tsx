@@ -7,9 +7,14 @@ import "./globals.css"
 import { AuthProvider } from "@/components/auth-provider"
 
 export const metadata: Metadata = {
-  title: "v0 App",
+  title: "City Pulse",
   description: "Created with v0",
   generator: "v0.app",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 }
 
 export default function RootLayout({

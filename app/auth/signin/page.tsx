@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { FcGoogle } from "react-icons/fc";
 
 export default function SignIn() {
@@ -47,7 +48,7 @@ export default function SignIn() {
     initAuth();
   }, [router]);
 
-  // ✅ Email Sign-In
+  // Email Sign-In
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!supabase) return;
@@ -84,7 +85,7 @@ export default function SignIn() {
     }
   };
 
-  // ✅ Google OAuth
+  // Google OAuth
   const handleGoogleSignIn = async () => {
     if (!supabase) return;
     setLoading(true);
@@ -126,124 +127,160 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key`}
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-indigo-50 to-indigo-100 px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl space-y-8"
-      >
-        {/* Header */}
+    <div className="min-h-screen flex">
+      {/* Left Side - Logo */}
+      <div className="hidden lg:flex lg:w-1/2 bg-white items-center justify-center">
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900">
-            Welcome Back 👋
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Sign in to your account or{" "}
-            <a
-              href="/auth/signup"
-              className="font-medium text-indigo-600 hover:text-indigo-500"
-            >
-              create a new one
-            </a>
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            width={600}
+            height={450}
+            className="max-w-full h-auto mx-auto"
+          />
+          <h1 className="mt-12 text-6xl font-bold text-gray-900">
+            Welcome Back
+          </h1>
+          <p className="mt-6 text-2xl text-gray-600">
+            Sign in to access your account
           </p>
         </div>
+      </div>
 
-        {/* Error */}
-        {error && (
-          <div className="bg-red-50 border border-red-300 text-red-700 p-3 rounded-md text-sm">
-            {error}
+      {/* Right Side - Login Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-white px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full">
+          <div className="text-center lg:hidden mb-8">
+            <Image
+              src="/logo.png"
+              alt="Logo"
+              width={180}
+              height={135}
+              className="h-32 w-auto mx-auto"
+            />
+            <h2 className="mt-6 text-4xl font-extrabold text-gray-900">
+              Sign in to your account
+            </h2>
           </div>
-        )}
 
-        {/* Google Sign-In */}
-        <button
-          onClick={handleGoogleSignIn}
-          disabled={loading}
-          className="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-md py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium transition disabled:opacity-60"
-        >
-          <FcGoogle className="text-lg" /> Continue with Google
-        </button>
+          <div className="bg-white py-12 px-8 rounded-2xl shadow-2xl border border-gray-100">
+            {/* Error */}
+            {error && (
+              <div className="mb-6 bg-red-50 border border-red-300 text-red-700 p-4 rounded-xl text-sm">
+                {error}
+              </div>
+            )}
 
-        {/* Divider */}
-        <div className="relative my-4">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300" />
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="bg-white px-3 text-gray-500">or continue with</span>
+            <div className="flex flex-col space-y-8">
+              <form onSubmit={handleSignIn} className="space-y-8">
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="block text-lg font-medium text-gray-700"
+                  >
+                    Email address
+                  </label>
+                  <div className="mt-2">
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="appearance-none block w-full px-4 py-4 border border-gray-300 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 text-lg"
+                      placeholder="Enter your email"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="password"
+                    className="block text-lg font-medium text-gray-700"
+                  >
+                    Password
+                  </label>
+                  <div className="mt-2">
+                    <input
+                      id="password"
+                      name="password"
+                      type="password"
+                      autoComplete="current-password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="appearance-none block w-full px-4 py-4 border border-gray-300 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 text-lg"
+                      placeholder="Enter your password"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <input
+                      id="remember-me"
+                      name="remember-me"
+                      type="checkbox"
+                      className="h-5 w-5 text-gray-900 focus:ring-gray-900 border-gray-300 rounded"
+                    />
+                    <label htmlFor="remember-me" className="ml-3 block text-base text-gray-700">
+                      Remember me
+                    </label>
+                  </div>
+
+                  <div className="text-lg">
+                    <a href="#" className="font-medium text-gray-900 hover:text-gray-700">
+                      Forgot your password?
+                    </a>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`w-full flex justify-center py-4 px-6 border border-transparent rounded-xl shadow-lg text-lg font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-all duration-200 ${
+                    loading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {loading ? "Signing in..." : "Sign in"}
+                </button>
+              </form>
+
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-xl py-4 px-6 bg-white hover:bg-gray-50 text-gray-700 text-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-60"
+              >
+                <FcGoogle className="text-2xl" />
+                Continue with Google
+              </button>
+            </div>
+
+            <div className="mt-10">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200" />
+                </div>
+                <div className="relative flex justify-center text-base">
+                  <span className="px-4 bg-white text-gray-500">New to our platform?</span>
+                </div>
+              </div>
+
+              <div className="mt-8 text-center">
+                <a
+                  href="/auth/signup"
+                  className="font-medium text-gray-900 hover:text-gray-700 text-lg"
+                >
+                  Create an account
+                </a>
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* Form */}
-        <form onSubmit={handleSignIn} className="space-y-5">
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Email address
-            </label>
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder="you@example.com"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder="••••••••"
-            />
-          </div>
-
-          <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center space-x-2 text-gray-700">
-              <input
-                type="checkbox"
-                className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
-              />
-              <span>Remember me</span>
-            </label>
-            <a
-              href="#"
-              className="text-indigo-600 hover:text-indigo-500 font-medium"
-            >
-              Forgot password?
-            </a>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full py-2 px-4 text-sm font-medium text-white rounded-md transition ${
-              loading
-                ? "bg-indigo-400 cursor-not-allowed"
-                : "bg-indigo-600 hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-            }`}
-          >
-            {loading ? "Signing in..." : "Sign in"}
-          </button>
-        </form>
-      </motion.div>
+      </div>
     </div>
   );
 }
