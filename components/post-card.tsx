@@ -19,16 +19,21 @@ interface PostInteraction {
 
 export function PostCard({
   post,
+  initialInteraction,
 }: {
   post: Post
+  initialInteraction?: PostInteraction
 }) {
-  const [interaction, setInteraction] = useState<PostInteraction>({
-    likes: post.likes || 0,
-    comments: post.comments?.length || 0,
-    shares: post.shares || 0,
-    isLiked: false
-  })
+  const [interaction, setInteraction] = useState<PostInteraction>(
+    initialInteraction || {
+      likes: post.likes || 0,
+      comments: post.comments?.length || 0,
+      shares: post.shares || 0,
+      isLiked: false,
+    }
+  )
   const [isCommentDialogOpen, setIsCommentDialogOpen] = useState(false)
+  const [showCopiedPopup, setShowCopiedPopup] = useState(false)
 
   // Load interaction data from localStorage on mount
   useEffect(() => {
@@ -73,7 +78,8 @@ export function PostCard({
         ...prev,
         shares: prev.shares + 1
       }))
-      // You could add a toast notification here
+      setShowCopiedPopup(true)
+      setTimeout(() => setShowCopiedPopup(false), 2000)
     } catch (err) {
       console.error("Failed to copy link:", err)
     }
@@ -177,15 +183,23 @@ export function PostCard({
             <MessageCircle className="size-4" aria-hidden="true" />
             {interaction.comments}
           </button>
-          <button
-            type="button"
-            className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
-            onClick={handleShare}
-            aria-label="Share post"
-          >
-            <Share2 className="size-4" aria-hidden="true" />
-            {interaction.shares}
-          </button>
+          <div className="relative">
+            <button
+              type="button"
+              className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
+              onClick={handleShare}
+              aria-label="Share post"
+            >
+              <Share2 className="size-4" aria-hidden="true" />
+              {interaction.shares}
+            </button>
+            {showCopiedPopup && (
+              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10">
+                Link is copied
+                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
+              </div>
+            )}
+          </div>
         </div>
 
         {post.status === "rejected" && post.adminNote ? (

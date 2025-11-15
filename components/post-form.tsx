@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 
 type Priority = 'High' | 'Medium' | 'Low'
 
@@ -179,7 +180,7 @@ export function PostForm() {
       }
       
       // Redirect to home page
-      router.push('/')
+      router.push('/home')
       router.refresh()
     } catch (error) {
       console.error('Error submitting post:', error)
@@ -209,6 +210,43 @@ export function PostForm() {
     <div className="max-w-2xl mx-auto p-4">
       <h2 className="text-2xl font-bold mb-6">Report an Issue</h2>
       <form onSubmit={handleSubmit} className="grid gap-4">
+        {/* Anonymous toggle at the top */}
+        {user && (
+          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div>
+              <Label htmlFor="anonymous" className="text-sm font-medium">
+                Post Anonymously
+              </Label>
+              <p className="text-xs text-muted-foreground mt-1">
+                Your name will not be shown with this post.
+              </p>
+            </div>
+            <Switch
+              id="anonymous"
+              checked={isAnonymous}
+              onCheckedChange={setIsAnonymous}
+              disabled={isSubmitting}
+            />
+          </div>
+        )}
+
+        {!user && (
+          <div className="p-3 bg-muted rounded-lg">
+            <p className="text-sm text-muted-foreground">
+              🔒 You are posting as <strong>Anonymous</strong>. 
+              {` `}
+              <button 
+                type="button" 
+                onClick={() => router.push('/auth/login')}
+                className="text-primary underline hover:no-underline"
+              >
+                Log in
+              </button>
+              {` `}to post with your name.
+            </p>
+          </div>
+        )}
+
         <div className="grid gap-2">
           <Label htmlFor="title">Title *</Label>
           <Input 
@@ -275,45 +313,6 @@ export function PostForm() {
             </SelectContent>
           </Select>
         </div>
-
-        {/* Anonymous reporting option - only show if user is logged in */}
-        {user && (
-          <div className="grid gap-2">
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="anonymous"
-                checked={isAnonymous}
-                onChange={(e) => setIsAnonymous(e.target.checked)}
-                disabled={isSubmitting}
-                className="rounded border-gray-300"
-              />
-              <Label htmlFor="anonymous" className="text-sm font-medium leading-none">
-                Report anonymously
-              </Label>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Your name will not be shown with this issue.
-            </p>
-          </div>
-        )}
-
-        {!user && (
-          <div className="p-3 bg-muted rounded-lg">
-            <p className="text-sm text-muted-foreground">
-              🔒 You are reporting as <strong>Anonymous</strong>. 
-              {` `}
-              <button 
-                type="button" 
-                onClick={() => router.push('/auth/login')}
-                className="text-primary underline hover:no-underline"
-              >
-                Log in
-              </button>
-              {` `}to report with your name.
-            </p>
-          </div>
-        )}
 
         <div className="grid gap-2">
           <Label>Images (max 3)</Label>
