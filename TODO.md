@@ -1,5 +1,9 @@
-- [x] Remove user-related code: mockUsers, filteredUsers, TabType 'users', activeTab state, People tab button, user rendering section
-- [x] Integrate real posts using usePosts hook instead of mockPosts
-- [x] Update post filtering to search in title and body (description) fields
-- [x] Adjust post rendering to use real post data (e.g., images from array)
-- [ ] Test the search functionality
+# Profile Section Update to Fetch from DB
+
+## Tasks
+- [x] Add fetchProfile function in lib/local-db.ts to retrieve user profile from Supabase 'profiles' table
+- [x] Update app/profile/page.tsx to fetch profile data from DB instead of using mockProfileData
+- [x] Update app/profile/page.tsx to fetch posts from DB using getPostsFromDB()
+- [x] Handle authentication: ensure user is logged in, redirect if not
+- [x] Test the profile page to verify data loads from DB (server running on localhost:3001)
+- [x] Handle loading states and errors appropriately
