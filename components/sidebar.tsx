@@ -10,7 +10,7 @@ const items = [
   { href: "/home", label: "Home", icon: Home },
   { href: "/aichat", label: "AI Chat", icon: MessageSquare },
   { href: "/search", label: "Search", icon: Search },
-  { href: "/analytics", label: "Analytics", icon: BarChart2 },
+  { href: "/analytics", label: "Leaderboard", icon: BarChart2 },
   { href: "/profile", label: "Profile", icon: User },
 ]
 
