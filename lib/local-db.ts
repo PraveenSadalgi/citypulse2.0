@@ -220,7 +220,7 @@ function normalizePost(p: any): Post {
     images: Array.isArray(p?.images) ? p.images.slice(0, 3) : [],
     video:
       p?.video && typeof p.video?.src === "string"
-        ? { src: String(p.video.src), alt: String(p.video.alt ?? "video") }
+        ? { src: String(p.video.src), type: String(p.video.type ?? "") }
         : null,
     likes: Number.isFinite(p?.likes) ? Number(p.likes) : 0,
     dislikes: Number.isFinite(p?.dislikes) ? Number(p.dislikes) : 0,
@@ -354,7 +354,7 @@ export async function savePostsToDB(posts: Post[]) {
   }
 }
 
-export async function fetchProfile(userId: string): Promise<ProfileData | null> {
+export async function getProfileFromDB(userId: string): Promise<ProfileData | null> {
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
@@ -362,11 +362,23 @@ export async function fetchProfile(userId: string): Promise<ProfileData | null> 
     .single()
 
   if (error) {
-    console.error('Error fetching profile:', error)
+    console.error('Error fetching profile from DB:', error)
     return null
   }
 
-  return data as ProfileData
+  // Map avatar_url from DB to avatar in ProfileData
+  return {
+    id: data.id,
+    name: data.name,
+    handle: data.handle,
+    email: data.email,
+    avatar: data.avatar_url, // Map avatar_url to avatar
+    bio: data.bio,
+    interests: data.interests,
+    profession: data.profession,
+    posts_count: data.posts_count,
+    coins: data.coins,
+  } as ProfileData
 }
 
 export async function saveProfile(profile: ProfileData): Promise<void> {
@@ -374,18 +386,13 @@ export async function saveProfile(profile: ProfileData): Promise<void> {
     // Save guest profile to local storage
     write('guest.profile', profile)
   } else {
-    // Save to Supabase (excluding bio, interests as they're not in the schema)
+    // Save to Supabase, including avatar
+    const { avatar, bio, interests, ...profileWithoutAvatar } = profile
     const { error } = await supabase
       .from('profiles')
       .upsert({
-        id: profile.id,
-        name: profile.name,
-        handle: profile.handle,
-        email: profile.email,
-        avatar: profile.avatar,
-        profession: profile.profession,
-        posts_count: profile.posts_count,
-        coins: profile.coins,
+        ...profileWithoutAvatar,
+        avatar_url: avatar, // Store avatar URL in avatar_url column
       })
 
     if (error) {

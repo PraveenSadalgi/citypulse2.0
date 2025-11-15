@@ -8,7 +8,7 @@ import { TopBar } from "@/components/top-bar"
 import { Camera } from "lucide-react"
 import { useState, useMemo, useEffect, useRef } from "react"
 import { Sidebar } from "@/components/sidebar"
-import { ProfileData, Post, fetchProfile, getPosts, saveProfile } from "@/lib/local-db"
+import { ProfileData, Post, getProfileFromDB, getPosts, saveProfile } from "@/lib/local-db"
 import { Input } from "@/components/ui/input"
 import AnimatedLoadingSkeleton from "@/components/ui/loading-skeleton"
 import { useAuth } from "@/components/auth-provider"
@@ -125,7 +125,7 @@ export default function ProfilePage() {
           setPosts([])
         } else {
           const [profile, allPosts] = await Promise.all([
-            fetchProfile(user!.id),
+            getProfileFromDB(user!.id),
             getPosts()
           ])
 
@@ -198,8 +198,23 @@ export default function ProfilePage() {
       const interests = editedInterests.split(",").map(s => s.trim()).filter(s => s)
       let avatarUrl = profileData.avatar
       if (avatarFile) {
-        // For now, we'll just use a placeholder URL
-        avatarUrl = "/professional-headshot.png"
+        // Upload to Supabase storage bucket 'profile_photos'
+        const fileExt = avatarFile.name.split('.').pop()
+        const fileName = `${profileData.id}_${Date.now()}.${fileExt}`
+        const { data, error: uploadError } = await supabase.storage
+          .from('profile_photos')
+          .upload(fileName, avatarFile)
+
+        if (uploadError) {
+          throw new Error('Failed to upload avatar: ' + uploadError.message)
+        }
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('profile_photos')
+          .getPublicUrl(fileName)
+
+        avatarUrl = publicUrl
       }
       const updatedData = {
         ...profileData,
@@ -214,6 +229,7 @@ export default function ProfilePage() {
 
       setProfileData(updatedData)
       setEditing(false)
+      setAvatarFile(null)
 
       // Show success message
       alert('Profile updated successfully!')
