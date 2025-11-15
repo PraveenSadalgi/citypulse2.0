@@ -136,16 +136,16 @@ export default function HomeChatPage() {
                   {messages.map((message) => (
                     <div
                       key={message.id}
-                      className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                      className={`flex w-full ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
                       <div
-                        className={`max-w-[85%] p-6 rounded-3xl shadow-lg ${
+                        className={`max-w-[75%] sm:max-w-[65%] md:max-w-[55%] p-4 sm:p-6 rounded-3xl shadow-lg ${
                           message.type === 'user'
                             ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-br-none shadow-green-200'
                             : 'bg-white text-gray-800 border-2 border-green-100 rounded-bl-none shadow-green-100'
                         }`}
                       >
-                        <p className="whitespace-pre-wrap break-words text-base leading-relaxed font-medium">{message.content}</p>
+                        <p className="whitespace-pre-wrap break-words text-sm sm:text-base leading-relaxed font-medium">{message.content}</p>
                         <p className={`text-xs mt-3 font-semibold ${
                           message.type === 'user' ? 'text-green-100' : 'text-gray-500'
                         }`}>
@@ -155,8 +155,8 @@ export default function HomeChatPage() {
                     </div>
                   ))}
                   {loading && (
-                    <div className="flex justify-start">
-                      <div className="max-w-[85%] p-6 rounded-3xl rounded-bl-none bg-white border-2 border-green-100 shadow-lg">
+                    <div className="flex w-full justify-start">
+                      <div className="max-w-[75%] sm:max-w-[65%] md:max-w-[55%] p-4 sm:p-6 rounded-3xl rounded-bl-none bg-white border-2 border-green-100 shadow-lg">
                         <div className="flex items-center space-x-4">
                           <div className="flex space-x-2">
                             <div className="w-3 h-3 bg-green-500 rounded-full animate-bounce"></div>
@@ -173,26 +173,26 @@ export default function HomeChatPage() {
                   )}
                 </div>
               </ScrollArea>
-              <div className="p-6 border-t-2 border-green-100 bg-gradient-to-r from-green-50 to-emerald-50 rounded-b-3xl">
-                <form onSubmit={handleSubmit} className="flex space-x-4 items-center">
+              <div className="p-4 sm:p-6 border-t-2 border-green-100 bg-gradient-to-r from-green-50 to-emerald-50 rounded-b-3xl">
+                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
                   <Input
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Ask about city issues, services, or reports... (e.g., 'How many potholes were reported this week?')"
                     disabled={loading}
-                    className="flex-1 border-2 border-green-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 bg-white text-lg py-6 px-4 rounded-2xl shadow-sm transition-all duration-200"
+                    className="flex-1 border-2 border-green-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 bg-white text-base sm:text-lg py-4 sm:py-6 px-4 rounded-2xl shadow-sm transition-all duration-200"
                   />
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     disabled={loading}
-                    className="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 border-2 border-green-600 text-white shadow-lg py-6 px-8 rounded-2xl transition-all duration-200 hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+                    className="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 border-2 border-green-600 text-white shadow-lg py-4 sm:py-6 px-6 sm:px-8 rounded-2xl transition-all duration-200 hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 whitespace-nowrap"
                   >
                     {loading ? (
-                      <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
                     ) : (
                       <div className="flex items-center space-x-2">
-                        <span className="text-lg font-semibold">Send</span>
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <span className="text-sm sm:text-lg font-semibold">Send</span>
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
                         </svg>
                       </div>
@@ -200,7 +200,7 @@ export default function HomeChatPage() {
                   </Button>
                 </form>
                 <div className="flex justify-center mt-4">
-                  <p className="text-sm text-gray-500 text-center">
+                  <p className="text-xs sm:text-sm text-gray-500 text-center">
                     Ask about reports, services, or any city-related information
                   </p>
                 </div>
