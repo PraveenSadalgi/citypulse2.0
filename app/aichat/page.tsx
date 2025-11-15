@@ -43,7 +43,7 @@ export default function AIChatPage() {
             />
           )}
         </div>
-        <BottomNav active="aichat" />
+        <BottomNav />
       </div>
     </div>
   );
