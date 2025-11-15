@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import "./globals.css"
 import { AuthProvider } from "@/components/auth-provider"
+import ConfirmProvider from "@/components/confirm-provider"
 
 export const metadata: Metadata = {
   title: "City Pulse",
@@ -28,12 +29,14 @@ export default function RootLayout({
         <meta httpEquiv="Permissions-Policy" content="camera=(self), geolocation=(self)" />
       </head>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
-        <AuthProvider>
-          <Suspense fallback={null}>
-            {children}
-          </Suspense>
-          <Analytics />
-        </AuthProvider>
+        <ConfirmProvider>
+          <AuthProvider>
+            <Suspense fallback={null}>
+              {children}
+            </Suspense>
+            <Analytics />
+          </AuthProvider>
+        </ConfirmProvider>
       </body>
     </html>
   )

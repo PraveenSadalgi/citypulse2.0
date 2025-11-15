@@ -1,14 +1,18 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
+import { useConfirm } from './confirm-provider';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import type { Session, User } from '@supabase/supabase-js';
+import { signOut as localSignOut } from '@/lib/local-db';
 
 type AuthContextType = {
   user: User | null;
   session: Session | null;
-  signOut: () => Promise<void>;
+  // pass skipConfirm = true to avoid an extra browser confirm when the caller
+  // already showed a UI confirmation (e.g. an AlertDialog)
+  signOut: (skipConfirm?: boolean) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,6 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const supabase = createClientComponentClient();
+  const confirm = useConfirm()
 
   useEffect(() => {
     // Get the current session
@@ -43,9 +48,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [supabase.auth, router]);
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
-    router.push('/auth/signin');
+  const signOut = async (skipConfirm = false) => {
+    try {
+      if (!skipConfirm) {
+        // Use global styled confirm dialog
+        const ok = await confirm({
+          title: 'Sign out',
+          description: 'You will be redirected to the sign-in page and will need to log in again to access your account.',
+          confirmLabel: 'Sign out',
+          cancelLabel: 'Cancel',
+        })
+        if (!ok) return;
+      }
+
+      await supabase.auth.signOut();
+      // Clear any local data
+      try {
+        localSignOut()
+      } catch (e) {
+        // non-fatal, just log
+        // eslint-disable-next-line no-console
+        console.warn('localSignOut failed', e)
+      }
+      router.push('/auth/signin');
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('Error signing out', e);
+      throw e;
+    }
   };
 
   const value = {
