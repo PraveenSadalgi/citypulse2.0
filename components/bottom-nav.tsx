@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import type { LucideIcon } from "lucide-react"
-import { Plus, Home, MessageSquare, Search, BarChart2, User } from "lucide-react"
+import { Plus, Home, MessageSquare, Search, BarChart2, User, Heart } from "lucide-react"
 
 type Item = { 
   href: string 
@@ -17,7 +17,7 @@ const navItems: Item[] = [
   { href: "/home", label: "Home", icon: Home },
   { href: "/search", label: "Search", icon: Search },
   { href: "/analytics", label: "", icon: BarChart2 }, // Empty label for the center button
-  { href: "/aichat", label: "Chat", icon: MessageSquare },
+  { href: "/donate", label: "Donate", icon: Heart },
   { href: "/profile", label: "Profile", icon: User },
 ]
 

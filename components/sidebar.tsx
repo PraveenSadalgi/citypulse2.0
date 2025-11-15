@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, MessageSquare, Search, BarChart2, User } from "lucide-react"
+import { Home, MessageSquare, Search, BarChart2, User, Heart } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
 
@@ -11,6 +11,7 @@ const items = [
   { href: "/aichat", label: "AI Chat", icon: MessageSquare },
   { href: "/search", label: "Search", icon: Search },
   { href: "/analytics", label: "Leaderboard", icon: BarChart2 },
+  { href: "/donate", label: "Donate", icon: Heart },
   { href: "/profile", label: "Profile", icon: User },
 ]
 
