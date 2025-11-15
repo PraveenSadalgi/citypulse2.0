@@ -251,13 +251,7 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-          
-          <Link
-            href="/homechat"
-            className="fixed right-4 bottom-36 z-50 inline-flex h-14 w-14 items-center justify-center rounded-full bg-blue-500 text-white shadow-lg"
-          >
-            <span className="sr-only">Home Chat</span>💬
-          </Link>
+        
 
           <Link
             href="/posts/new"

@@ -73,15 +73,20 @@ export function Sidebar() {
         </nav>
         
         <div className="p-4 border-t border-gray-100">
-          <div className="flex items-center gap-3 rounded-xl bg-green-50 p-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 text-green-600">
-              <MessageSquare className="h-5 w-5" />
+          <Link 
+            href="/homechat"
+            className="block transition-transform hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <div className="flex items-center gap-3 rounded-xl bg-green-50 p-3 cursor-pointer hover:bg-green-100 transition-colors">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 text-green-600">
+                <MessageSquare className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">Need help?</p>
+                <p className="text-xs text-gray-500">Chat with our support</p>
+              </div>
             </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900">Need help?</p>
-              <p className="text-xs text-gray-500">Chat with our support</p>
-            </div>
-          </div>
+          </Link>
         </div>
       </div>
     </aside>
