@@ -411,12 +411,12 @@ export default function SearchPage() {
                     </div>
                     
                     <div className="pt-4 mt-6 border-t border-gray-200">
-                      <Link 
+                      {/* <Link 
                         href={`/issues/${showDetails.id}`}
                         className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                       >
                         View Full Details
-                      </Link>
+                      </Link> */}
                     </div>
                   </div>
                 </div>
