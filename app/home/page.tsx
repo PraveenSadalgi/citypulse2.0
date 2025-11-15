@@ -194,7 +194,7 @@ export default function HomePage() {
         <div className="min-h-screen bg-white">
           <div className="h-32 bg-gradient-to-b from-[#B8F1B0] to-white"></div>
           <div className="mx-auto w-full max-w-7xl px-4 md:px-8 -mt-20 relative z-10">
-            <div className="flex flex-col lg:flex-row gap-8">
+            <div className="flex flex-col lg:flex-row gap-20">
               {/* Main content - Posts */}
               <section className="flex-1 max-w-2xl">
                 {posts.map((post) => (
