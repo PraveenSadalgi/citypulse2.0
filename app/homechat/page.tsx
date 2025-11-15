@@ -145,7 +145,7 @@ export default function HomeChatPage() {
                             : 'bg-white text-gray-800 border-2 border-green-100 rounded-bl-none shadow-green-100'
                         }`}
                       >
-                        <p className="whitespace-pre-wrap text-base leading-relaxed font-medium">{message.content}</p>
+                        <p className="whitespace-pre-wrap break-words text-base leading-relaxed font-medium">{message.content}</p>
                         <p className={`text-xs mt-3 font-semibold ${
                           message.type === 'user' ? 'text-green-100' : 'text-gray-500'
                         }`}>

@@ -44,29 +44,40 @@ export async function POST(request: NextRequest) {
       return acc
     }, {} as Record<string, number>)
 
+    // Classify query type
+    const isDatabaseQuery = /\b(issue|report|pothole|street|water|electricity|garbage|traffic|lighting|damage|broken|repair|fix|problem|complaint|category|count|total|today|week|month)\b/i.test(query)
+
     // Check if Gemini API key is available
     const geminiApiKey = process.env.GEMINI_API_KEY
     if (!geminiApiKey) {
       // Fallback response without AI
-      let response = `Based on our database:\n\nTotal issues: ${issues.length}\nToday's issues: ${todayIssues.length}\n\nCategory breakdown:\n`
-      Object.entries(categoryCounts).forEach(([category, count]) => {
-        response += `${category}: ${count}\n`
-      })
-      response += `\nToday's category breakdown:\n`
-      Object.entries(todayCategoryCounts).forEach(([category, count]) => {
-        response += `${category}: ${count}\n`
-      })
-      return NextResponse.json({ response })
+      if (isDatabaseQuery) {
+        let response = `Based on our database:\n\nTotal issues: ${issues.length}\nToday's issues: ${todayIssues.length}\n\nCategory breakdown:\n`
+        Object.entries(categoryCounts).forEach(([category, count]) => {
+          response += `${category}: ${count}\n`
+        })
+        response += `\nToday's category breakdown:\n`
+        Object.entries(todayCategoryCounts).forEach(([category, count]) => {
+          response += `${category}: ${count}\n`
+        })
+        return NextResponse.json({ response })
+      } else {
+        return NextResponse.json({ response: "I'm here to help with city-related issues and information. You can ask me about reported problems, city services, or how to report an issue. For general questions, I recommend checking official city resources or contacting local authorities directly." })
+      }
     }
 
     // Use Gemini API to generate response
+    const prompt = isDatabaseQuery
+      ? `User query: "${query}"\n\nDatabase data summary:\n- Total issues in database: ${issues.length}\n- Issues reported today: ${todayIssues.length}\n- Category breakdown: ${JSON.stringify(categoryCounts)}\n- Today's category breakdown: ${JSON.stringify(todayCategoryCounts)}\n\nPlease provide a helpful, accurate response based on this data. Answer questions about issue counts, categories, and trends. If the query doesn't match the data, say so politely.`
+      : `User query: "${query}"\n\nYou are CityZen, an intelligent city assistant. The user is asking a general question. Provide a helpful, friendly response. If it's about city services, reporting issues, or general information, offer assistance. For non-city related topics, politely redirect to city-related help or suggest appropriate resources. Be conversational and supportive.`
+
     const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${geminiApiKey}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{
           parts: [{
-            text: `User query: "${query}"\n\nDatabase data summary:\n- Total issues in database: ${issues.length}\n- Issues reported today: ${todayIssues.length}\n- Category breakdown: ${JSON.stringify(categoryCounts)}\n- Today's category breakdown: ${JSON.stringify(todayCategoryCounts)}\n\nPlease provide a helpful, accurate response based on this data. Answer questions about issue counts, categories, and trends. If the query doesn't match the data, say so politely.`
+            text: prompt
           }]
         }]
       })
