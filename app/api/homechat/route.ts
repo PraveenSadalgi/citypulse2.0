@@ -14,48 +14,84 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Query is required" }, { status: 400 })
     }
 
-    // Fetch data from issues table
+    // Fetch all data from issues table
     const { data: issues, error } = await supabase
       .from("issues")
-      .select("category, created_at")
+      .select("*")
 
     if (error) {
-      return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 })
+      console.error("Supabase error:", error)
+      return NextResponse.json({ error: "Failed to fetch data from database" }, { status: 500 })
+    }
+
+    if (!issues || issues.length === 0) {
+      return NextResponse.json({ response: "No issues found in the database." })
     }
 
     // Process the data
     const today = new Date().toISOString().split('T')[0]
-    const todayIssues = issues.filter(issue => issue.created_at.startsWith(today))
+    const todayIssues = issues.filter(issue => issue.created_at && issue.created_at.startsWith(today))
 
     const categoryCounts = issues.reduce((acc, issue) => {
-      acc[issue.category] = (acc[issue.category] || 0) + 1
+      const category = issue.category || 'Uncategorized'
+      acc[category] = (acc[category] || 0) + 1
       return acc
     }, {} as Record<string, number>)
 
     const todayCategoryCounts = todayIssues.reduce((acc, issue) => {
-      acc[issue.category] = (acc[issue.category] || 0) + 1
+      const category = issue.category || 'Uncategorized'
+      acc[category] = (acc[category] || 0) + 1
       return acc
     }, {} as Record<string, number>)
 
+    // Check if Gemini API key is available
+    const geminiApiKey = process.env.GEMINI_API_KEY
+    if (!geminiApiKey) {
+      // Fallback response without AI
+      let response = `Based on our database:\n\nTotal issues: ${issues.length}\nToday's issues: ${todayIssues.length}\n\nCategory breakdown:\n`
+      Object.entries(categoryCounts).forEach(([category, count]) => {
+        response += `${category}: ${count}\n`
+      })
+      response += `\nToday's category breakdown:\n`
+      Object.entries(todayCategoryCounts).forEach(([category, count]) => {
+        response += `${category}: ${count}\n`
+      })
+      return NextResponse.json({ response })
+    }
+
     // Use Gemini API to generate response
-    const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+    const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${geminiApiKey}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{
           parts: [{
-            text: `User query: ${query}\n\nData summary:\nTotal issues: ${issues.length}\nToday's issues: ${todayIssues.length}\nCategory breakdown: ${JSON.stringify(categoryCounts)}\nToday's category breakdown: ${JSON.stringify(todayCategoryCounts)}\n\nPlease provide a helpful response based on this data.`
+            text: `User query: "${query}"\n\nDatabase data summary:\n- Total issues in database: ${issues.length}\n- Issues reported today: ${todayIssues.length}\n- Category breakdown: ${JSON.stringify(categoryCounts)}\n- Today's category breakdown: ${JSON.stringify(todayCategoryCounts)}\n\nPlease provide a helpful, accurate response based on this data. Answer questions about issue counts, categories, and trends. If the query doesn't match the data, say so politely.`
           }]
         }]
       })
     })
 
+    if (!geminiResponse.ok) {
+      console.error("Gemini API error:", geminiResponse.status, geminiResponse.statusText)
+      // Fallback to basic response
+      let response = `Based on our database:\n\nTotal issues: ${issues.length}\nToday's issues: ${todayIssues.length}\n\nCategory breakdown:\n`
+      Object.entries(categoryCounts).forEach(([category, count]) => {
+        response += `${category}: ${count}\n`
+      })
+      return NextResponse.json({ response })
+    }
+
     const geminiData = await geminiResponse.json()
-    const response = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate a response."
+    console.log("Gemini response:", geminiData)
+
+    const response = geminiData.candidates?.[0]?.content?.parts?.[0]?.text ||
+                    geminiData.error?.message ||
+                    "Sorry, I couldn't generate a response. Please try again."
 
     return NextResponse.json({ response })
   } catch (error) {
     console.error("Error:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    return NextResponse.json({ error: "Internal server error", details: error instanceof Error ? error.message : "Unknown error" }, { status: 500 })
   }
 }
