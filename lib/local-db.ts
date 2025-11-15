@@ -353,3 +353,44 @@ export async function savePostsToDB(posts: Post[]) {
     if (error) console.error(error)
   }
 }
+
+export async function fetchProfile(userId: string): Promise<ProfileData | null> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single()
+
+  if (error) {
+    console.error('Error fetching profile:', error)
+    return null
+  }
+
+  return data as ProfileData
+}
+
+export async function saveProfile(profile: ProfileData): Promise<void> {
+  if (profile.id === 'guest') {
+    // Save guest profile to local storage
+    write('guest.profile', profile)
+  } else {
+    // Save to Supabase (excluding bio, interests as they're not in the schema)
+    const { error } = await supabase
+      .from('profiles')
+      .upsert({
+        id: profile.id,
+        name: profile.name,
+        handle: profile.handle,
+        email: profile.email,
+        avatar: profile.avatar,
+        profession: profile.profession,
+        posts_count: profile.posts_count,
+        coins: profile.coins,
+      })
+
+    if (error) {
+      console.error('Error saving profile:', error)
+      throw error
+    }
+  }
+}
