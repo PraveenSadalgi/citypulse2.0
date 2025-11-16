@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import type { LucideIcon } from "lucide-react"
-import { Plus, Home, MessageSquare, Search, BarChart2, User, Heart } from "lucide-react"
+import { Home, MessageSquare, Search, BarChart2, Heart } from "lucide-react"
 
 type Item = { 
   href: string 
@@ -17,8 +17,8 @@ const navItems: Item[] = [
   { href: "/home", label: "Home", icon: Home },
   { href: "/search", label: "Search", icon: Search },
   { href: "/analytics", label: "Leaderboard", icon: BarChart2 },
-  { href: "/aichat", label: "", icon: MessageSquare }, // Empty label for the center button
-  { href: "/profile", label: "Profile", icon: User },
+  { href: "/aichat", label: "AI Chat", icon: MessageSquare },
+  { href: "/donate", label: "Donate", icon: Heart },
 ]
 
 export function BottomNav() {
@@ -29,28 +29,13 @@ export function BottomNav() {
     <div className="fixed bottom-4 left-0 right-0 z-40 px-4 sm:hidden">
       <nav className="relative mx-auto max-w-md">
         <div className="relative rounded-2xl bg-white/95 px-4 shadow-xl shadow-black/5 backdrop-blur-lg border border-gray-100">
-          <ul className="relative flex items-center justify-between">
+          <ul className="relative flex items-center justify-between flex-nowrap">
             {navItems.map((item, index) => {
               const isActive = pathname === item.href
-              const isCenter = item.href === "/aichat"
               const Icon = item.icon
 
-              if (isCenter) {
-                return (
-                  <li key={item.href} className="relative -top-6">
-                    <Link
-                      href="/aichat"
-                      aria-label="AI Chat"
-                      className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg shadow-green-200/80 transition-all hover:scale-105 hover:shadow-xl hover:shadow-green-200/50"
-                    >
-                      <MessageSquare className="h-6 w-6" strokeWidth={2.5} />
-                    </Link>
-                  </li>
-                )
-              }
-              
               return (
-                <li key={item.href} className="flex-1">
+                <li key={item.href} className="flex-1 min-w-0">
                   <Link
                     href={item.href}
                     className={cn(
@@ -67,7 +52,7 @@ export function BottomNav() {
                     )}>
                       <Icon className={cn("h-5 w-5 transition-transform", isActive ? "scale-110" : "group-hover:scale-105")} />
                     </div>
-                    <span className={cn("text-[10px] font-medium transition-all", isActive ? "text-green-600" : "text-gray-500")}>
+                    <span className={cn("text-[10px] font-medium transition-all whitespace-nowrap truncate", isActive ? "text-green-600" : "text-gray-500")}>
                       {item.label}
                     </span>
                   </Link>
